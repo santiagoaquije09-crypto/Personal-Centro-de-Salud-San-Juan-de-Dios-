@@ -8,26 +8,26 @@ const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwsvnVQHz31bBGvt4K4R
 // 1. ENVÍO DE DATOS DEL FORMULARIO DE PACIENTES
 // ==========================================
 document.addEventListener('DOMContentLoaded', () => {
-    // Buscamos específicamente el formulario de pacientes (asegúrate de agregarle id="form-paciente" en tu HTML)
-    const formPaciente = document.querySelector('#form-paciente') || document.querySelector('form');
+    const formularios = document.querySelectorAll('form');
 
-    if (formPaciente) {
-        formPaciente.addEventListener('submit', (e) => {
-            // Si estamos en la pantalla de login (por seguridad), evitamos que dispare esto
-            const esLogin = formPaciente.querySelector('input[type="password"]') || formPaciente.innerText.includes('Contraseña');
-            if (esLogin) return; 
+    formularios.forEach(form => {
+        // IGNORAR el formulario de login (si tiene campo de contraseña o texto de contraseña)
+        if (form.querySelector('input[type="password"]') || form.innerText.includes('Contraseña')) {
+            return; 
+        }
 
+        form.addEventListener('submit', (e) => {
             e.preventDefault();
 
             // Recolectar datos del formulario de paciente
             const datos = {
                 tipoFormulario: 'pacientes',
-                nombres: formPaciente.querySelector('input:nth-of-type(1)')?.value || formPaciente.elements[0]?.value || '',
-                apellidos: formPaciente.querySelector('input:nth-of-type(2)')?.value || formPaciente.elements[1]?.value || '',
-                dni: formPaciente.querySelector('input:nth-of-type(3)')?.value || formPaciente.elements[2]?.value || '',
-                seguro: formPaciente.querySelector('select')?.value || 'SIS',
-                nacimiento: formPaciente.querySelector('input[type="date"]')?.value || '',
-                telefono: formPaciente.querySelector('input[type="tel"], input[placeholder*="9"]')?.value || ''
+                nombres: form.querySelector('input:nth-of-type(1)')?.value || form.elements[0]?.value || '',
+                apellidos: form.querySelector('input:nth-of-type(2)')?.value || form.elements[1]?.value || '',
+                dni: form.querySelector('input:nth-of-type(3)')?.value || form.elements[2]?.value || '',
+                seguro: form.querySelector('select')?.value || 'SIS',
+                nacimiento: form.querySelector('input[type="date"]')?.value || '',
+                telefono: form.querySelector('input[type="tel"], input[placeholder*="9"]')?.value || ''
             };
 
             // Enviar a Google Sheets mediante POST
@@ -41,14 +41,14 @@ document.addEventListener('DOMContentLoaded', () => {
             })
             .then(() => {
                 alert('¡Paciente registrado con éxito en Google Sheets!');
-                formPaciente.reset();
+                form.reset();
             })
             .catch(error => {
                 console.error('Error al enviar:', error);
                 alert('Hubo un error al registrar el paciente.');
             });
         });
-    }
+    });
 });
 
 
