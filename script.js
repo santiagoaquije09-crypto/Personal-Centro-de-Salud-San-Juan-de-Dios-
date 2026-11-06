@@ -5,68 +5,123 @@ const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwsvnVQHz31bBGvt4K4R
 
 
 // ==========================================
-// 1. ENVÍO EXCLUSIVO DEL FORMULARIO DE PACIENTES
+// 1. GESTIÓN DEL INICIO DE SESIÓN (LOGIN)
 // ==========================================
-document.addEventListener('click', (e) => {
-    // Detectar únicamente cuando se hace clic en el botón de guardar pacientes
-    const botonGuardar = e.target.closest('button, input[type="submit"]');
-    if (!botonGuardar) return;
+document.addEventListener('DOMContentLoaded', () => {
+    const loginForm = document.getElementById('loginForm');
+    const loginScreen = document.getElementById('login-screen');
+    const appContainer = document.getElementById('app-container');
+    const displayStaffName = document.getElementById('displayStaffName');
+    const displayStaffArea = document.getElementById('displayStaffArea');
+    const userAvatar = document.getElementById('userAvatar');
 
-    const textoBoton = botonGuardar.innerText || botonGuardar.value || '';
-    
-    // Si el botón pertenece al formulario de registro de pacientes
-    if (textoBoton.includes('Guardar e Ingresar a Google Sheets') || textoBoton.includes('Registrar')) {
-        const form = botonGuardar.closest('form');
-        if (!form) return;
+    if (loginForm) {
+        loginForm.addEventListener('submit', (e) => {
+            e.preventDefault();
 
-        // Doble seguridad: si estamos en el login, ignorar por completo
-        if (form.querySelector('input[type="password"]') || form.innerText.includes('Contraseña')) {
-            return;
-        }
+            const nombres = document.getElementById('staffNombres').value;
+            const area = document.getElementById('staffArea').value;
 
-        e.preventDefault();
+            // Mostrar nombre y área en la barra lateral
+            if (displayStaffName) displayStaffName.textContent = nombres;
+            if (displayStaffArea) displayStaffArea.textContent = area;
+            
+            // Generar iniciales para el avatar
+            if (userAvatar) {
+                const partes = nombres.trim().split(' ');
+                const iniciales = partes.length > 1 ? partes[0][0] + partes[1][0] : partes[0].substring(0, 2);
+                userAvatar.textContent = iniciales.toUpperCase();
+            }
 
-        // Recolectar datos de los campos de texto
-        const inputs = form.querySelectorAll('input, select');
-        const datos = {
-            tipoFormulario: 'pacientes',
-            nombres: inputs[0]?.value || '',
-            apellidos: inputs[1]?.value || '',
-            dni: inputs[2]?.value || '',
-            seguro: form.querySelector('select')?.value || 'SIS',
-            nacimiento: form.querySelector('input[type="date"]')?.value || '',
-            telefono: form.querySelector('input[type="tel"], input[placeholder*="9"], input:nth-of-type(5)')?.value || ''
-        };
+            // Ocultar login y mostrar el sistema principal
+            if (loginScreen) loginScreen.classList.add('hidden');
+            if (appContainer) appContainer.classList.remove('hidden');
+        });
+    }
 
-        // Enviar a Google Sheets mediante POST
-        fetch(SCRIPT_URL, {
-            method: 'POST',
-            mode: 'no-cors',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify(datos)
-        })
-        .then(() => {
-            alert('¡Paciente registrado con éxito en Google Sheets!');
-            form.reset();
-        })
-        .catch(error => {
-            console.error('Error al enviar:', error);
-            alert('Hubo un error al registrar el paciente.');
+    // Botón Cerrar Sesión
+    const btnLogout = document.getElementById('btnLogout');
+    if (btnLogout) {
+        btnLogout.addEventListener('click', () => {
+            if (loginScreen) loginScreen.classList.remove('hidden');
+            if (appContainer) appContainer.classList.add('hidden');
+            if (loginForm) loginForm.reset();
+        });
+    }
+
+    // Control de pestañas del menú lateral
+    const navButtons = document.querySelectorAll('.nav-btn[data-tab]');
+    navButtons.forEach(btn => {
+        btn.addEventListener('click', () => {
+            const targetTab = btn.getAttribute('data-tab');
+
+            // Quitar clase active a botones y paneles
+            navButtons.forEach(b => b.classList.remove('active'));
+            document.querySelectorAll('.tab-panel').forEach(panel => panel.classList.remove('active'));
+
+            // Activar botón y panel correspondiente
+            btn.classList.add('active');
+            const panelActivo = document.getElementById(targetTab);
+            if (panelActivo) panelActivo.classList.add('active');
+
+            // Si entra a la pestaña del directorio, cargar datos automáticamente
+            if (targetTab === 'tab-pacientes') {
+                cargarDirectorioPacientes();
+            }
+        });
+    });
+});
+
+
+// ==========================================
+// 2. ENVÍO EXCLUSIVO DEL FORMULARIO DE PACIENTES
+// ==========================================
+document.addEventListener('DOMContentLoaded', () => {
+    const patientForm = document.getElementById('patientForm');
+
+    if (patientForm) {
+        patientForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+
+            const datos = {
+                tipoFormulario: 'pacientes',
+                nombres: document.getElementById('nombres').value,
+                apellidos: document.getElementById('apellidos').value,
+                dni: document.getElementById('dni').value,
+                seguro: document.getElementById('seguro').value,
+                nacimiento: document.getElementById('nacimiento').value,
+                telefono: document.getElementById('telefono').value
+            };
+
+            fetch(SCRIPT_URL, {
+                method: 'POST',
+                mode: 'no-cors',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(datos)
+            })
+            .then(() => {
+                alert('¡Paciente registrado con éxito en Google Sheets!');
+                patientForm.reset();
+            })
+            .catch(error => {
+                console.error('Error al enviar:', error);
+                alert('Hubo un error al registrar el paciente.');
+            });
         });
     }
 });
 
 
 // ==========================================
-// 2. LECTURA Y CARGA DEL DIRECTORIO DE PACIENTES
+// 3. LECTURA Y CARGA DEL DIRECTORIO DE PACIENTES
 // ==========================================
 function cargarDirectorioPacientes() {
-    const tbody = document.querySelector('tbody');
+    const tbody = document.getElementById('patientTableBody');
     if (!tbody) return;
 
-    tbody.innerHTML = `<tr><td colspan="6" style="text-align: center; color: #007bff;">Cargando pacientes desde Google Sheets...</td></tr>`;
+    tbody.innerHTML = `<tr><td colspan="6" class="text-center" style="color: #007bff;">Cargando pacientes desde Google Sheets...</td></tr>`;
 
     fetch(SCRIPT_URL)
     .then(response => response.json())
@@ -74,7 +129,7 @@ function cargarDirectorioPacientes() {
         tbody.innerHTML = ''; 
 
         if (!pacientes || pacientes.length === 0) {
-            tbody.innerHTML = `<tr><td colspan="6" style="text-align: center; color: #666;">No hay registros cargados aún.</td></tr>`;
+            tbody.innerHTML = `<tr><td colspan="6" class="text-center">No hay registros cargados aún.</td></tr>`;
             return;
         }
 
@@ -93,14 +148,6 @@ function cargarDirectorioPacientes() {
     })
     .catch(error => {
         console.error('Error al cargar el directorio:', error);
-        tbody.innerHTML = `<tr><td colspan="6" style="text-align: center; color: red;">Error al cargar los datos. Revisa la consola.</td></tr>`;
+        tbody.innerHTML = `<tr><td colspan="6" class="text-center" style="color: red;">Error al cargar los datos. Revisa la consola.</td></tr>`;
     });
 }
-
-// Refrescar el directorio al hacer clic en su pestaña
-document.addEventListener('click', (e) => {
-    const texto = e.target.innerText || '';
-    if (texto.includes('Directorio de Pacientes') || e.target.closest('[data-tab="directorio"]')) {
-        setTimeout(cargarDirectorioPacientes, 300);
-    }
-});
