@@ -5,50 +5,57 @@ const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwsvnVQHz31bBGvt4K4R
 
 
 // ==========================================
-// 1. ENVÍO DE DATOS DEL FORMULARIO DE PACIENTES
+// 1. ENVÍO EXCLUSIVO DEL FORMULARIO DE PACIENTES
 // ==========================================
-document.addEventListener('DOMContentLoaded', () => {
-    const formularios = document.querySelectorAll('form');
+document.addEventListener('click', (e) => {
+    // Detectar únicamente cuando se hace clic en el botón de guardar pacientes
+    const botonGuardar = e.target.closest('button, input[type="submit"]');
+    if (!botonGuardar) return;
 
-    formularios.forEach(form => {
-        // IGNORAR el formulario de login (si tiene campo de contraseña o texto de contraseña)
+    const textoBoton = botonGuardar.innerText || botonGuardar.value || '';
+    
+    // Si el botón pertenece al formulario de registro de pacientes
+    if (textoBoton.includes('Guardar e Ingresar a Google Sheets') || textoBoton.includes('Registrar')) {
+        const form = botonGuardar.closest('form');
+        if (!form) return;
+
+        // Doble seguridad: si estamos en el login, ignorar por completo
         if (form.querySelector('input[type="password"]') || form.innerText.includes('Contraseña')) {
-            return; 
+            return;
         }
 
-        form.addEventListener('submit', (e) => {
-            e.preventDefault();
+        e.preventDefault();
 
-            // Recolectar datos del formulario de paciente
-            const datos = {
-                tipoFormulario: 'pacientes',
-                nombres: form.querySelector('input:nth-of-type(1)')?.value || form.elements[0]?.value || '',
-                apellidos: form.querySelector('input:nth-of-type(2)')?.value || form.elements[1]?.value || '',
-                dni: form.querySelector('input:nth-of-type(3)')?.value || form.elements[2]?.value || '',
-                seguro: form.querySelector('select')?.value || 'SIS',
-                nacimiento: form.querySelector('input[type="date"]')?.value || '',
-                telefono: form.querySelector('input[type="tel"], input[placeholder*="9"]')?.value || ''
-            };
+        // Recolectar datos de los campos de texto
+        const inputs = form.querySelectorAll('input, select');
+        const datos = {
+            tipoFormulario: 'pacientes',
+            nombres: inputs[0]?.value || '',
+            apellidos: inputs[1]?.value || '',
+            dni: inputs[2]?.value || '',
+            seguro: form.querySelector('select')?.value || 'SIS',
+            nacimiento: form.querySelector('input[type="date"]')?.value || '',
+            telefono: form.querySelector('input[type="tel"], input[placeholder*="9"], input:nth-of-type(5)')?.value || ''
+        };
 
-            // Enviar a Google Sheets mediante POST
-            fetch(SCRIPT_URL, {
-                method: 'POST',
-                mode: 'no-cors',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify(datos)
-            })
-            .then(() => {
-                alert('¡Paciente registrado con éxito en Google Sheets!');
-                form.reset();
-            })
-            .catch(error => {
-                console.error('Error al enviar:', error);
-                alert('Hubo un error al registrar el paciente.');
-            });
+        // Enviar a Google Sheets mediante POST
+        fetch(SCRIPT_URL, {
+            method: 'POST',
+            mode: 'no-cors',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(datos)
+        })
+        .then(() => {
+            alert('¡Paciente registrado con éxito en Google Sheets!');
+            form.reset();
+        })
+        .catch(error => {
+            console.error('Error al enviar:', error);
+            alert('Hubo un error al registrar el paciente.');
         });
-    });
+    }
 });
 
 
@@ -90,7 +97,7 @@ function cargarDirectorioPacientes() {
     });
 }
 
-// Escuchar clics en la navegación para refrescar el directorio automáticamente
+// Refrescar el directorio al hacer clic en su pestaña
 document.addEventListener('click', (e) => {
     const texto = e.target.innerText || '';
     if (texto.includes('Directorio de Pacientes') || e.target.closest('[data-tab="directorio"]')) {
