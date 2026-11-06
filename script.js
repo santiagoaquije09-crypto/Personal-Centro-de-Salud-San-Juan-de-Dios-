@@ -157,8 +157,6 @@ function enviarAGoogleSheets(datos, mensajeExito, formulario) {
         alert('Hubo un inconveniente al guardar los datos.');
     });
 }
-
-// Función global para cambiar el badge de estado de la cita
 function actualizarEstadoCita(selectElement) {
     const nuevoEstado = selectElement.value;
     const row = selectElement.closest('tr');
@@ -167,3 +165,48 @@ function actualizarEstadoCita(selectElement) {
     badge.textContent = nuevoEstado;
     badge.className = 'badge badge-' + nuevoEstado.toLowerCase();
 }
+
+// Función para cargar y mostrar los pacientes registrados en la tabla del Directorio
+function cargarDirectorioPacientes() {
+    fetch(SCRIPT_URL)
+    .then(response => response.json())
+    .then(pacientes => {
+        // Buscamos el contenedor de la tabla en el panel del directorio
+        const tbody = document.querySelector('.tab-panel#directorio tbody') || document.querySelector('table tbody');
+        if (!tbody) return;
+
+        tbody.innerHTML = ''; // Limpiar la tabla antes de cargar
+
+        if (!pacientes || pacientes.length === 0) {
+            tbody.innerHTML = `<tr><td colspan="6" style="text-align: center; color: #666;">No hay registros cargados aún.</td></tr>`;
+            return;
+        }
+
+        pacientes.forEach(p => {
+            const fila = document.createElement('tr');
+            fila.innerHTML = `
+                <td>${p.fecha || ''}</td>
+                <td>${p.nombres || ''} ${p.apellidos || ''}</td>
+                <td>${p.dni || ''}</td>
+                <td>${p.seguro || ''}</td>
+                <td>${p.nacimiento || ''}</td>
+                <td>${p.telefono || ''}</td>
+            `;
+            tbody.appendChild(fila);
+        });
+    })
+    .catch(error => console.error('Error al cargar el directorio:', error));
+}
+
+// Ejecutar la carga automáticamente cuando se haga clic en la pestaña del directorio
+document.addEventListener('DOMContentLoaded', () => {
+    const navButtons = document.querySelectorAll('.nav-btn:not(.btn-logout)');
+    navButtons.forEach(btn => {
+        btn.addEventListener('click', () => {
+            const targetTab = btn.getAttribute('data-tab');
+            if (targetTab === 'directorio') {
+                cargarDirectorioPacientes();
+            }
+        });
+    });
+});
