@@ -1,4 +1,4 @@
-const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwZHgN9g8N12WhGGdzFiMKMFZDwxQvztB5BA3VbAk5buPsspAIJmmhr9mr5ZjlKPFsy/exec';
+const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbx0fLFkLEbdaqvUWpohbUzMt7K-1IOl4sGMIZ1kZcClmRRvbZYIVm-iJ12dIUYEjXbo/exec';
 
 document.addEventListener('DOMContentLoaded', () => {
 
@@ -73,13 +73,14 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     });
 
-    // 4. Envío de Paciente a Google Sheets
+    // 4. Envío de Paciente Normal a Google Sheets
     const patientForm = document.getElementById('patientForm');
     if (patientForm) {
         patientForm.addEventListener('submit', function(e) {
             e.preventDefault();
 
             const datos = {
+                tipoFormulario: 'pacientes',
                 nombres: document.getElementById('nombres').value,
                 apellidos: document.getElementById('apellidos').value,
                 dni: document.getElementById('dni').value,
@@ -88,32 +89,43 @@ document.addEventListener('DOMContentLoaded', () => {
                 telefono: document.getElementById('telefono').value
             };
 
-            fetch(SCRIPT_URL, {
-                method: 'POST',
-                mode: 'no-cors',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(datos)
-            })
-            .then(() => {
-                alert('¡Paciente registrado con éxito en Google Sheets!');
-                patientForm.reset();
-            })
-            .catch(error => {
-                console.error('Error al enviar:', error);
-                alert('Hubo un inconveniente al registrar al paciente.');
-            });
+            enviarAGoogleSheets(datos, '¡Paciente registrado con éxito en Google Sheets!', patientForm);
         });
     }
 
-    // 5. Envío de Comentarios
+    // 5. Envío de Emergencias a Google Sheets
+    const emergencyForm = document.getElementById('emergencyForm');
+    if (emergencyForm) {
+        emergencyForm.addEventListener('submit', function(e) {
+            e.preventDefault();
+
+            const datos = {
+                tipoFormulario: 'emergencias',
+                paciente: document.getElementById('emergenciaPaciente').value,
+                prioridad: document.getElementById('emergenciaNivel').value,
+                sintomas: document.getElementById('emergenciaSintomas').value
+            };
+
+            enviarAGoogleSheets(datos, '🚨 ¡Ingreso de Emergencia registrado en Google Sheets!', emergencyForm);
+        });
+    }
+
+    // 6. Envío de Comentarios a Google Sheets
     const commentForm = document.getElementById('commentForm');
     if (commentForm) {
-        commentForm.addEventListener('submit', (e) => {
+        commentForm.addEventListener('submit', function(e) {
             e.preventDefault();
             const text = document.getElementById('commentText').value;
             const author = document.getElementById('displayStaffName').textContent;
             const now = new Date().toLocaleString();
 
+            const datos = {
+                tipoFormulario: 'comentarios',
+                autor: author,
+                comentario: text
+            };
+
+            // Mostrar instantáneamente en pantalla local
             const newComment = document.createElement('div');
             newComment.className = 'comment-card';
             newComment.innerHTML = `
@@ -121,14 +133,32 @@ document.addEventListener('DOMContentLoaded', () => {
                 <p>${text}</p>
                 <small>${now}</small>
             `;
-
             document.getElementById('commentsFeed').prepend(newComment);
-            commentForm.reset();
+
+            enviarAGoogleSheets(datos, '¡Comentario guardado en Google Sheets!', commentForm);
         });
     }
 });
 
-// Función global para cambiar dinámicamente el badge de estado de la cita
+// Función auxiliar para realizar el fetch a Google Apps Script
+function enviarAGoogleSheets(datos, mensajeExito, formulario) {
+    fetch(SCRIPT_URL, {
+        method: 'POST',
+        mode: 'no-cors',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(datos)
+    })
+    .then(() => {
+        alert(mensajeExito);
+        if (formulario) formulario.reset();
+    })
+    .catch(error => {
+        console.error('Error al enviar:', error);
+        alert('Hubo un inconveniente al guardar los datos.');
+    });
+}
+
+// Función global para cambiar el badge de estado de la cita
 function actualizarEstadoCita(selectElement) {
     const nuevoEstado = selectElement.value;
     const row = selectElement.closest('tr');
