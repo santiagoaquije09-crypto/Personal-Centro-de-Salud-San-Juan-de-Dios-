@@ -1,7 +1,7 @@
 // ==========================================
 // CONFIGURACIÓN DE LA URL DE GOOGLE APPS SCRIPT
 // ==========================================
-const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwTzZ_vBqJ9-sFp4zL8tXy2vG1mN3pQ5r7s9t8uV0wX2yZ4aB6c8d0eF/exec";
+const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwsvnVQHz31bBGvt4K4RAXRGSb8tJj-yX6zmcYvQjWEKqWKisyLtt6F2M02VxUwLJXs/exec";
 
 
 // ==========================================
