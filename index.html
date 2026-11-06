@@ -1,0 +1,285 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Sistema Clínico - Centro de Salud San Juan de Dios</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+  <!-- MÓDULO 1: LOGIN -->
+  <div id="loginView" class="login-wrapper">
+    <div class="login-box">
+      <div class="brand-header">
+        <div class="brand-logo"><i class="fa-solid fa-hospital-user"></i></div>
+        <h2>San Juan de Dios</h2>
+        <p class="brand-subtitle">PLATAFORMA INTEGRAL DE SALUD</p>
+        <span class="security-badge"><i class="fa-solid fa-shield-halved"></i> Acceso restringido al personal autorizado</span>
+      </div>
+
+      <form id="loginForm" class="login-form">
+        <div id="alertError" class="alert-box alert-error">
+          <i class="fa-solid fa-triangle-exclamation"></i>
+          <span>DNI o credenciales inválidas. Por favor intente de nuevo.</span>
+        </div>
+
+        <div class="input-field">
+          <label for="dni"><i class="fa-solid fa-id-card"></i> Documento DNI</label>
+          <input type="text" id="dni" placeholder="Ingrese su DNI" value="77837575" maxlength="8" required>
+        </div>
+
+        <div class="input-field">
+          <label for="codigo"><i class="fa-solid fa-key"></i> Código Institucional</label>
+          <input type="password" id="codigo" placeholder="Código de trabajador" value="MED-9921" required>
+        </div>
+
+        <div class="input-field">
+          <label for="password"><i class="fa-solid fa-lock"></i> Contraseña</label>
+          <input type="password" id="password" value="••••••••" required>
+        </div>
+
+        <div class="input-field">
+          <label for="role"><i class="fa-solid fa-user-doctor"></i> Perfil / Cargo asistencial</label>
+          <select id="role" required>
+            <option value="" disabled>Seleccione perfil de ingreso</option>
+            <option value="Admision" selected>Admisión / Recepción</option>
+            <option value="Médico">Médico Especialista / Cirujano</option>
+            <option value="Enfermería">Enfermería General / Kardex</option>
+            <option value="Triaje">Triaje de Urgencias</option>
+          </select>
+        </div>
+
+        <button type="submit" id="btnLogin" class="btn-primary">
+          <span class="btn-text">Ingresar al Sistema</span>
+          <i class="fa-solid fa-arrow-right-to-bracket"></i>
+          <div class="spinner"></div>
+        </button>
+      </form>
+      <div class="login-footer"><p><i class="fa-solid fa-headset"></i> Soporte TI Interno: Ext. 4040</p></div>
+    </div>
+  </div>
+
+  <!-- MÓDULO 2: DASHBOARD INTEGRAL -->
+  <div id="dashboardView" class="dashboard-wrapper">
+    
+    <!-- Sidebar / Menú Principal -->
+    <aside class="sidebar-nav">
+      <div class="sidebar-brand">
+        <i class="fa-solid fa-heart-pulse logo-icon"></i>
+        <div>
+          <h4>SISTEMA MÉDICO</h4>
+          <small>CS. San Juan de Dios</small>
+        </div>
+      </div>
+
+      <nav class="sidebar-menu">
+        <div class="menu-label">PRINCIPAL</div>
+        <a href="#" class="menu-item active" data-section="sec-panel"><i class="fa-solid fa-chart-line"></i> Panel de Control</a>
+        <a href="#" class="menu-item" data-section="sec-admision"><i class="fa-solid fa-user-plus"></i> Admisión Pacientes / SIS</a>
+        <a href="#" class="menu-item" data-section="sec-historias"><i class="fa-solid fa-folder-medical"></i> Historias Clínicas</a>
+
+        <div class="menu-label">ASISTENCIAL</div>
+        <a href="#" class="menu-item" data-section="sec-kardex"><i class="fa-solid fa-notes-medical"></i> Control Kardex Enfermería</a>
+        <a href="#" class="menu-item" data-section="sec-recetas"><i class="fa-solid fa-file-prescription"></i> Recetas y Órdenes Médicas</a>
+        <a href="#" class="menu-item" data-section="sec-turnos"><i class="fa-solid fa-calendar-check"></i> Turnos y Programación</a>
+      </nav>
+
+      <div class="sidebar-footer">
+        <button id="btnLogout" class="btn-logout">
+          <i class="fa-solid fa-power-off"></i>
+          <span>Cerrar Sesión</span>
+        </button>
+      </div>
+    </aside>
+
+    <!-- ÁREA DE TRABAJO PRINCIPAL -->
+    <main class="main-body">
+      
+      <header class="top-header">
+        <div class="header-title">
+          <h2 id="sectionTitle">Gestión de Atención Asistencial</h2>
+          <p id="sectionSubtitle">Módulo de Control y Seguimiento de Pacientes</p>
+        </div>
+
+        <div class="user-profile-widget">
+          <div class="avatar"><i class="fa-solid fa-user-nurse"></i></div>
+          <div class="user-details">
+            <span id="userDniDisplay" class="user-name">DNI 77837575</span>
+            <span id="userRoleDisplay" class="user-role">Admisión / Recepción</span>
+          </div>
+        </div>
+      </header>
+
+      <!-- SECCIÓN 1: PANEL DE CONTROL -->
+      <section id="sec-panel" class="app-section active">
+        <div class="metrics-grid">
+          <div class="metric-card">
+            <div class="metric-icon blue"><i class="fa-solid fa-users"></i></div>
+            <div class="metric-data"><span class="metric-value">48</span><span class="metric-title">Pacientes en Turno</span></div>
+          </div>
+          <div class="metric-card">
+            <div class="metric-icon orange"><i class="fa-solid fa-clock"></i></div>
+            <div class="metric-data"><span class="metric-value">12</span><span class="metric-title">En Espera / Triaje</span></div>
+          </div>
+          <div class="metric-card">
+            <div class="metric-icon red"><i class="fa-solid fa-bed-pulse"></i></div>
+            <div class="metric-data"><span class="metric-value">95%</span><span class="metric-title">Ocupación Emergencia</span></div>
+          </div>
+          <div class="metric-card">
+            <div class="metric-icon green"><i class="fa-solid fa-stethoscope"></i></div>
+            <div class="metric-data"><span class="metric-value">8</span><span class="metric-title">Médicos Activos</span></div>
+          </div>
+        </div>
+
+        <div class="content-card" style="margin-top: 24px;">
+          <div class="card-header">
+            <h3><i class="fa-solid fa-list-check"></i> Pacientes Registrados en Turno Actual</h3>
+            <div class="search-box">
+              <i class="fa-solid fa-magnifying-glass"></i>
+              <input type="text" id="searchInput" placeholder="Buscar por Nombre, DNI o HC...">
+            </div>
+          </div>
+          <div class="table-container">
+            <table id="patientsTable">
+              <thead>
+                <tr>
+                  <th>N° HC</th><th>Paciente</th><th>DNI</th><th>Cobertura / Seguro</th><th>Área de Atención</th><th>Estado</th><th class="text-right">Acciones</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td><span class="hc-code">HC-8801</span></td>
+                  <td><div class="patient-info"><strong>Juan Pérez Gómez</strong><small>45 años | M</small></div></td>
+                  <td>45892103</td>
+                  <td><span class="badge badge-sis"><i class="fa-solid fa-circle-check"></i> SIS Activo</span></td>
+                  <td>Emergencias - Cama 02</td>
+                  <td><span class="status-dot status-pending"></span> Pendiente</td>
+                  <td class="text-right"><button class="btn-table btn-table-primary"><i class="fa-solid fa-stethoscope"></i> Atender</button></td>
+                </tr>
+                <tr>
+                  <td><span class="hc-code">HC-8802</span></td>
+                  <td><div class="patient-info"><strong>María López Ruiz</strong><small>32 años | F</small></div></td>
+                  <td>10293847</td>
+                  <td><span class="badge badge-particular"><i class="fa-solid fa-building-columns"></i> Particular</span></td>
+                  <td>Consultorio 04 (Medicina)</td>
+                  <td><span class="status-dot status-process"></span> En Proceso</td>
+                  <td class="text-right"><button class="btn-table btn-table-secondary"><i class="fa-solid fa-eye"></i> Ver Historia</button></td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      <!-- SECCIÓN 2: ADMISIÓN PACIENTES / SIS -->
+      <section id="sec-admision" class="app-section">
+        <div class="content-card">
+          <div class="card-header">
+            <h3><i class="fa-solid fa-user-plus"></i> Formulario de Registro de Nuevo Paciente / SIS</h3>
+          </div>
+          <form class="form-grid">
+            <div class="input-field"><label>Nombres Completos</label><input type="text" placeholder="Ej. Carlos Alberto"></div>
+            <div class="input-field"><label>Apellidos</label><input type="text" placeholder="Ej. Ramos Flores"></div>
+            <div class="input-field"><label>DNI / Documento</label><input type="text" placeholder="8 dígitos"></div>
+            <div class="input-field"><label>Tipo de Seguro</label>
+              <select><option>SIS Gratuito</option><option>SIS Independiente</option><option>Particular</option></select>
+            </div>
+            <div class="input-field"><label>Fecha de Nacimiento</label><input type="date"></div>
+            <div class="input-field"><label>Teléfono de Contacto</label><input type="tel" placeholder="987654321"></div>
+            <div style="grid-column: 1 / -1; margin-top: 10px;">
+              <button type="button" class="btn-primary" style="width: 200px;"><i class="fa-solid fa-floppy-disk"></i> Registrar Paciente</button>
+            </div>
+          </form>
+        </div>
+      </section>
+
+      <!-- SECCIÓN 3: HISTORIAS CLÍNICAS -->
+      <section id="sec-historias" class="app-section">
+        <div class="content-card">
+          <div class="card-header">
+            <h3><i class="fa-solid fa-folder-medical"></i> Buscador de Historias Clínicas Electrónicas</h3>
+          </div>
+          <div class="search-bar-lg">
+            <input type="text" placeholder="Ingrese N° de Historia Clínica o DNI del paciente...">
+            <button class="btn-primary"><i class="fa-solid fa-magnifying-glass"></i> Buscar Archivo</button>
+          </div>
+          <div class="info-box-placeholder">
+            <i class="fa-solid fa-file-medical-pulse"></i>
+            <p>Ingrese un criterio de búsqueda para visualizar el expediente médico digital del paciente.</p>
+          </div>
+        </div>
+      </section>
+
+      <!-- SECCIÓN 4: KARDEX ENFERMERÍA -->
+      <section id="sec-kardex" class="app-section">
+        <div class="content-card">
+          <div class="card-header">
+            <h3><i class="fa-solid fa-notes-medical"></i> Control de Medicamentos y Kardex</h3>
+          </div>
+          <div class="table-container">
+            <table>
+              <thead>
+                <tr><th>Hora</th><th>Paciente</th><th>Cama / Sala</th><th>Medicamento / Tratamiento</th><th>Dosis</th><th>Enfermera Responsable</th><th>Estado</th></tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>08:00 AM</td><td>Juan Pérez Gómez</td><td>Cama 02</td><td>Cloruro de Sodio 9‰ 1000ml</td><td>EV Continuo</td><td>Lic. Ana Torres</td><td><span class="badge badge-sis">Administrado</span></td>
+                </tr>
+                <tr>
+                  <td>10:00 AM</td><td>María López Ruiz</td><td>Consultorio 04</td><td>Paracetamol 500mg</td><td>1 Tab VO</td><td>Lic. Ana Torres</td><td><span class="badge badge-particular">Pendiente</span></td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      <!-- SECCIÓN 5: RECETAS Y ÓRDENES -->
+      <section id="sec-recetas" class="app-section">
+        <div class="content-card">
+          <div class="card-header">
+            <h3><i class="fa-solid fa-file-prescription"></i> Emisión de Recetas y Órdenes Médicas</h3>
+          </div>
+          <form class="form-grid">
+            <div class="input-field"><label>Código Paciente (HC)</label><input type="text" placeholder="Ej. HC-8801"></div>
+            <div class="input-field"><label>Diagnóstico CIE-10</label><input type="text" placeholder="Ej. K29.7 Gastritis"></div>
+            <div class="input-field" style="grid-column: 1 / -1;"><label>Indicaciones Médicas / Tratamiento</label>
+              <textarea rows="4" style="width: 100%; border: 1px solid var(--border-color); border-radius: var(--radius); padding: 10px;" placeholder="Escriba medicamentos, dosis y posología..."></textarea>
+            </div>
+            <div><button type="button" class="btn-primary" style="width: 220px;"><i class="fa-solid fa-print"></i> Generar Orden Médica</button></div>
+          </form>
+        </div>
+      </section>
+
+      <!-- SECCIÓN 6: TURNOS Y PROGRAMACIÓN -->
+      <section id="sec-turnos" class="app-section">
+        <div class="content-card">
+          <div class="card-header">
+            <h3><i class="fa-solid fa-calendar-check"></i> Rol de Turnos del Personal Asistencial</h3>
+          </div>
+          <div class="table-container">
+            <table>
+              <thead>
+                <tr><th>Personal</th><th>Cargo</th><th>Turno Actual</th><th>Horario</th><th>Servicio Asignado</th></tr>
+              </thead>
+              <tbody>
+                <tr><td>Dr. Roberto Gomez</td><td>Médico Cirujano</td><td>Mañana</td><td>07:00 - 13:00</td><td>Emergencia / Triaje</td></tr>
+                <tr><td>Lic. Ana Torres</td><td>Enfermería</td><td>Mañana</td><td>07:00 - 13:00</td><td>Hospitalización</td></tr>
+                <tr><td>Tec. Carlos Dávila</td><td>Admisión</td><td>Mañana</td><td>07:00 - 15:00</td><td>Módulo Central</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+    </main>
+  </div>
+
+  <script src="script.js"></script>
+</body>
+</html>
