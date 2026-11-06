@@ -33,20 +33,16 @@ document.addEventListener('DOMContentLoaded', () => {
             const nombres = document.getElementById('staffNombres').value;
             let area = selectStaffArea.value;
 
-            // Si seleccionó "Otros", tomamos la especialidad escrita en el cuadro de texto
             if (area === 'Otros') {
                 area = inputStaffAreaOtra.value.trim() || 'Especialista';
             }
 
-            // Actualizar datos del usuario en la barra lateral
             document.getElementById('displayStaffName').textContent = nombres;
             document.getElementById('displayStaffArea').textContent = area;
             
-            // Generar iniciales para el avatar
             const iniciales = nombres.split(' ').map(n => n[0]).join('').substring(0, 2).toUpperCase();
             document.getElementById('userAvatar').textContent = iniciales || 'MD';
 
-            // Mostrar el dashboard principal y ocultar login
             loginScreen.classList.add('hidden');
             appContainer.classList.remove('hidden');
         });
@@ -79,7 +75,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // 4. Envío de Paciente a Google Sheets
     const patientForm = document.getElementById('patientForm');
-    
     if (patientForm) {
         patientForm.addEventListener('submit', function(e) {
             e.preventDefault();
@@ -96,9 +91,7 @@ document.addEventListener('DOMContentLoaded', () => {
             fetch(SCRIPT_URL, {
                 method: 'POST',
                 mode: 'no-cors',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
+                headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(datos)
             })
             .then(() => {
@@ -111,4 +104,36 @@ document.addEventListener('DOMContentLoaded', () => {
             });
         });
     }
+
+    // 5. Envío de Comentarios
+    const commentForm = document.getElementById('commentForm');
+    if (commentForm) {
+        commentForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+            const text = document.getElementById('commentText').value;
+            const author = document.getElementById('displayStaffName').textContent;
+            const now = new Date().toLocaleString();
+
+            const newComment = document.createElement('div');
+            newComment.className = 'comment-card';
+            newComment.innerHTML = `
+                <strong>${author}</strong>
+                <p>${text}</p>
+                <small>${now}</small>
+            `;
+
+            document.getElementById('commentsFeed').prepend(newComment);
+            commentForm.reset();
+        });
+    }
 });
+
+// Función global para cambiar dinámicamente el badge de estado de la cita
+function actualizarEstadoCita(selectElement) {
+    const nuevoEstado = selectElement.value;
+    const row = selectElement.closest('tr');
+    const badge = row.querySelector('.badge');
+
+    badge.textContent = nuevoEstado;
+    badge.className = 'badge badge-' + nuevoEstado.toLowerCase();
+}

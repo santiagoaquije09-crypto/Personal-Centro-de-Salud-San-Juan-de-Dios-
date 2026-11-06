@@ -47,7 +47,6 @@
                     </select>
                 </div>
 
-                <!-- Campo dinámico que aparece si eligen "Otros" -->
                 <div class="form-group hidden" id="groupStaffAreaOtra">
                     <label for="staffAreaOtra">Especificar Área / Especialidad</label>
                     <input type="text" id="staffAreaOtra" placeholder="Ej. Cardiología, Odontología, etc.">
@@ -58,7 +57,7 @@
         </div>
     </div>
 
-    <!-- SISTEMA PRINCIPAL (Inicialmente Oculto) -->
+    <!-- SISTEMA PRINCIPAL -->
     <div id="app-container" class="app-container hidden">
         <!-- Barra Lateral del Médico -->
         <aside class="sidebar">
@@ -79,34 +78,28 @@
             </div>
 
             <nav class="nav-menu">
-                <button class="nav-btn active" data-tab="tab-pacientes">
-                    📁 Directorio de Pacientes
-                </button>
-                <button class="nav-btn" data-tab="tab-registro">
-                    ➕ Registrar Nuevo Paciente
-                </button>
-                <button class="nav-btn" data-tab="tab-historias">
-                    📋 Historias Clínicas
-                </button>
-                <button class="nav-btn btn-logout" id="btnLogout">
-                    🚪 Cerrar Sesión
-                </button>
+                <button class="nav-btn active" data-tab="tab-pacientes">📁 Directorio de Pacientes</button>
+                <button class="nav-btn" data-tab="tab-registro">➕ Registrar Nuevo Paciente</button>
+                <button class="nav-btn" data-tab="tab-citas">📅 Citas Registradas</button>
+                <button class="nav-btn" data-tab="tab-registro-virtual">🌐 Registros Virtuales</button>
+                <button class="nav-btn" data-tab="tab-emergencias">🚨 Atención Emergencias</button>
+                <button class="nav-btn" data-tab="tab-comentarios">💬 Comentarios y Notas</button>
+                <button class="nav-btn" data-tab="tab-historias">📋 Historias Clínicas</button>
+                <button class="nav-btn btn-logout" id="btnLogout">🚪 Cerrar Sesión</button>
             </nav>
         </aside>
 
         <!-- Contenido Principal -->
         <main class="main-content">
-            <!-- Sección 1: Buscar y Directorio -->
+            <!-- Sección 1: Directorio -->
             <section id="tab-pacientes" class="tab-panel active">
                 <header class="section-header">
                     <h1>Directorio de Pacientes</h1>
                     <p>Búsqueda e historial clínico consolidado</p>
                 </header>
-
                 <div class="search-bar">
                     <input type="text" id="searchPatient" placeholder="Buscar por DNI o Apellidos del paciente...">
                 </div>
-
                 <div class="table-card">
                     <table>
                         <thead>
@@ -134,7 +127,6 @@
                     <h1>Registro de Nuevo Paciente</h1>
                     <p>Ficha de filiación e ingreso al sistema asistencial</p>
                 </header>
-
                 <div class="form-card">
                     <form id="patientForm">
                         <div class="form-grid">
@@ -142,17 +134,14 @@
                                 <label for="nombres">Nombres Completos</label>
                                 <input type="text" id="nombres" name="nombres" required placeholder="Ej. Juan Carlos">
                             </div>
-
                             <div class="form-group">
                                 <label for="apellidos">Apellidos Completos</label>
                                 <input type="text" id="apellidos" name="apellidos" required placeholder="Ej. Pérez Gómez">
                             </div>
-
                             <div class="form-group">
                                 <label for="dni">DNI / Documento</label>
                                 <input type="text" id="dni" name="dni" required maxlength="8" placeholder="8 dígitos">
                             </div>
-
                             <div class="form-group">
                                 <label for="seguro">Tipo de Seguro</label>
                                 <select id="seguro" name="seguro" required>
@@ -162,18 +151,15 @@
                                     <option value="Otros">Otros</option>
                                 </select>
                             </div>
-
                             <div class="form-group">
                                 <label for="nacimiento">Fecha de Nacimiento</label>
                                 <input type="date" id="nacimiento" name="nacimiento" required>
                             </div>
-
                             <div class="form-group">
                                 <label for="telefono">Teléfono de Contacto</label>
                                 <input type="tel" id="telefono" name="telefono" required placeholder="9XXXXXXXX">
                             </div>
                         </div>
-
                         <div class="form-actions">
                             <button type="submit" class="btn-primary">Guardar e Ingresar a Google Sheets</button>
                         </div>
@@ -181,7 +167,147 @@
                 </div>
             </section>
 
-            <!-- Sección 3: Historias Clínicas -->
+            <!-- NUEVA SECCIÓN: CITAS REGISTRADAS -->
+            <section id="tab-citas" class="tab-panel">
+                <header class="section-header">
+                    <h1>Gestión de Citas Registradas</h1>
+                    <p>Control de estado de citas y comentarios médicos</p>
+                </header>
+
+                <div class="filters-bar">
+                    <select id="filterCitaStatus">
+                        <option value="todos">Todos los Estados</option>
+                        <option value="Pendiente">Pendiente</option>
+                        <option value="Atendido">Atendido</option>
+                        <option value="Reprogramada">Reprogramada</option>
+                        <option value="Cancelada">Cancelada</option>
+                    </select>
+                </div>
+
+                <div class="table-card">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Fecha y Hora</th>
+                                <th>Paciente</th>
+                                <th>Especialidad</th>
+                                <th>Estado</th>
+                                <th>Comentarios</th>
+                                <th>Acción</th>
+                            </tr>
+                        </thead>
+                        <tbody id="citasTableBody">
+                            <tr>
+                                <td>06/11/2026 09:00 AM</td>
+                                <td>Ana María Mendoza</td>
+                                <td>Medicina General</td>
+                                <td><span class="badge badge-pendiente">Pendiente</span></td>
+                                <td>Primera consulta de control</td>
+                                <td>
+                                    <select class="status-select" onchange="actualizarEstadoCita(this)">
+                                        <option value="Pendiente" selected>Pendiente</option>
+                                        <option value="Atendido">Atendido</option>
+                                        <option value="Reprogramada">Reprogramar</option>
+                                        <option value="Cancelada">Cancelar</option>
+                                    </select>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+
+            <!-- NUEVA SECCIÓN: REGISTROS VIRTUALES -->
+            <section id="tab-registro-virtual" class="tab-panel">
+                <header class="section-header">
+                    <h1>Pacientes Registrados Vía Web / Virtual</h1>
+                    <p>Validación de pre-registros ingresados desde el formulario web público</p>
+                </header>
+                <div class="table-card">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Fecha Solicitud</th>
+                                <th>Paciente</th>
+                                <th>DNI</th>
+                                <th>Correo / Contacto</th>
+                                <th>Seguro</th>
+                                <th>Estado de Validación</th>
+                            </tr>
+                        </thead>
+                        <tbody id="virtualTableBody">
+                            <tr>
+                                <td>06/11/2026</td>
+                                <td>Carlos Alberto Ruiz</td>
+                                <td>74859612</td>
+                                <td>carlos.ruiz@gmail.com</td>
+                                <td>SIS</td>
+                                <td><button class="btn-sm btn-primary">Aprobar e Ingresar</button></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+
+            <!-- NUEVA SECCIÓN: EMERGENCIAS -->
+            <section id="tab-emergencias" class="tab-panel">
+                <header class="section-header">
+                    <h1>Módulo de Atención de Emergencias</h1>
+                    <p>Priorización y triaje rápido de pacientes urgentes</p>
+                </header>
+                <div class="form-card emergency-card">
+                    <h3>Ingreso Rápido por Emergencia</h3>
+                    <form id="emergencyForm">
+                        <div class="form-grid">
+                            <div class="form-group">
+                                <label for="emergenciaPaciente">Nombre del Paciente / NN</label>
+                                <input type="text" id="emergenciaPaciente" required placeholder="Nombre o NN-1">
+                            </div>
+                            <div class="form-group">
+                                <label for="emergenciaNivel">Nivel de Prioridad (Triaje)</label>
+                                <select id="emergenciaNivel" required>
+                                    <option value="I - Resucitación">Prioridad I (Resucitación)</option>
+                                    <option value="II - Emergencia">Prioridad II (Emergencia)</option>
+                                    <option value="III - Urgencia">Prioridad III (Urgencia)</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label for="emergenciaSintomas">Motivo / Síntomas Rápidos</label>
+                                <input type="text" id="emergenciaSintomas" required placeholder="Ej. Dolor torácico, traumatismo">
+                            </div>
+                        </div>
+                        <button type="submit" class="btn-danger">🚨 Registrar Ingreso Urgente</button>
+                    </form>
+                </div>
+            </section>
+
+            <!-- NUEVA SECCIÓN: COMENTARIOS Y NOTAS -->
+            <section id="tab-comentarios" class="tab-panel">
+                <header class="section-header">
+                    <h1>Comentarios y Observaciones Médicas</h1>
+                    <p>Notas de seguimiento e incidencias del personal asistencial</p>
+                </header>
+                <div class="form-card">
+                    <form id="commentForm">
+                        <div class="form-group">
+                            <label for="commentText">Nuevo Comentario / Observación General</label>
+                            <textarea id="commentText" rows="3" required placeholder="Escriba aquí sus observaciones sobre el turno o seguimiento..."></textarea>
+                        </div>
+                        <br>
+                        <button type="submit" class="btn-primary">Guardar Comentario</button>
+                    </form>
+                </div>
+                <br>
+                <div id="commentsFeed" class="comments-feed">
+                    <div class="comment-card">
+                        <strong>Dr. Pedro Alarcón - Turno Mañana</strong>
+                        <p>Se atendieron 15 pacientes en el área de admisión sin eventualidades.</p>
+                        <small>06/11/2026 11:30 AM</small>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Sección Historias Clínicas -->
             <section id="tab-historias" class="tab-panel">
                 <header class="section-header">
                     <h1>Historias Clínicas y Antecedentes</h1>
